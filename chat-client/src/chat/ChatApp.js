@@ -1,54 +1,55 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import './ChatApp.css';
 import ChatMessageField from './message-field/ChatMessageField';
 import ChatWindow from './window/ChatWindow';
 
-class ChatApp extends React.Component {
 
-    clientWebSocket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
+const ChatApp = () => {
+    const [messages, setMessages] = useState([])
+    const [messageText, setMessageText] = useState("")
+    const [userName, setUserName] = useState("anonymus")
 
-    constructor(props) {
-        super(props)
-        this.state = {
-            messages : Array(0)
-        }
-    }
+    const clientWebSocket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
 
-    componentDidMount() {
-
+    useEffect(() => {
         document.title = 'Chatter'
 
-        this.clientWebSocket.onopen = function () {
+        clientWebSocket.onopen =  () => {
             console.log("clientWebSocket.onopen");
         }
-        this.clientWebSocket.onclose = function (error) {
+        clientWebSocket.onclose =  (error) => {
             console.log("clientWebSocket.onclose", error);
         }
-        this.clientWebSocket.onerror = function (error) {
+        clientWebSocket.onerror =  (error) => {
             console.log("clientWebSocket.onerror", error);
         }
-        this.clientWebSocket.onmessage = (event) => {
-            let messagesCopy = this.state.messages.slice();
-            messagesCopy.push(JSON.parse(event.data))
-            this.setState({
-                messages : messagesCopy
-            })
+        clientWebSocket.onmessage = (event) => {
+            setMessages((prev) => [...prev, JSON.parse(event.data)])
         }
-        
-        
+    }, [clientWebSocket.CONNECTING])
+
+    const sendMessage = () => {
+        if (messageText.length === 0) {
+            return
+        }
+        const message = {
+            userName,
+            content: messageText
+        }
+        clientWebSocket.readyState === clientWebSocket.OPEN && clientWebSocket.send(JSON.stringify(message))
+        setMessageText("")
     }
 
-    render() {
-        return (
-            <div>
-                <h1 className="text-center">Chatter</h1>
-                <div className="container chat-app">
-                    <ChatWindow messages={this.state.messages}/>
-                    <ChatMessageField webSocket={this.clientWebSocket}/>
-                </div>
+    return (
+        <div className="whole-app">
+            <div className="chat-app">
+                <h1 className="header-container chat-message">chatter</h1>
+                <ChatWindow userName={userName} messages={messages}/>
+                <ChatMessageField userName={userName} messageText={messageText} send={sendMessage}
+                                  setMessageText={setMessageText} setUserName={setUserName}/>
             </div>
-        );
-    }
+        </div>
+    );
 }
 
 export default ChatApp

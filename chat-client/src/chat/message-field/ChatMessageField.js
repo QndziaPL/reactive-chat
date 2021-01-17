@@ -1,57 +1,30 @@
 import React from 'react';
 import './ChatMessageField.css';
 
-class ChatMessageField extends React.Component {
+const ChatMessageField = ({userName, setMessageText, setUserName, messageText, send}) => {
 
-    constructor(props) {
-        super(props)
-
-        this.state = {
-            value: '',
-            userName: 'defaultUser'
+    const handleEnterPressed = event => {
+        if (event.key === "Enter"){
+            event.preventDefault()
+            send()
         }
-
-        this.handleTextChange = this.handleTextChange.bind(this);
-        this.send = this.send.bind(this);
-        this.handleUserNameChange = this.handleUserNameChange.bind(this);
     }
-
-    send() {
-        const message = {
-            userName: this.state.userName,
-            content: this.state.value
-        }
-        this.props.webSocket.send(JSON.stringify(message))
-    }
-
-    handleTextChange(event) {
-        this.setState({
-            userName: this.state.userName,
-            value: event.target.value
-        });
-    }
-
-    handleUserNameChange(event) {
-        this.setState({
-            userName: event.target.value,
-            value: this.state.value
-        });
-    }
-
-    render() {
-        return (
-            <div>
-                <div className="row chat-message-field">
-                    <textarea id="messageInput" className="form-control chat-text-field" value={this.state.value} onChange={this.handleTextChange}></textarea>
-                    <button id="sendButton" className="btn btn-light btn-block" onClick={this.send}>Send</button>
-                </div>
-                <div className="row input-group">
-                    <span className="input-group-text" id="basic-addon1">UserName</span>
-                    <input id="usernameInput" type="text" className="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" value={this.state.userName} onChange={this.handleUserNameChange} />
-                </div>
+    return (
+        <div className="message-input-container">
+            <div className="chat-message-field">
+                    <textarea id="messageInput" className="form-control chat-text-field" value={messageText}
+                              onKeyPress={handleEnterPressed} rows={3} wrap={"hard"}
+                              name="messageText" onChange={(event) => setMessageText(event.target.value)}/>
+                <div id="sendButton" className="send-button" onClick={send}>Send</div>
             </div>
-        );
-    }
+
+            <div style={{textAlign: "right"}}>
+                <label className="username-input-label">Nick: </label>
+                <input id="username-input" type="text" className="form-control" placeholder="Username"
+                       value={userName} name="userName" onChange={(event) => setUserName(event.target.value)}/>
+            </div>
+        </div>
+    );
 }
 
 export default ChatMessageField
