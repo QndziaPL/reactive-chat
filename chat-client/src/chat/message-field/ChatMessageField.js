@@ -4,7 +4,7 @@ import './ChatMessageField.css';
 const ChatMessageField = ({userName, setMessageText, setUserName, messageText, send}) => {
 
     const handleEnterPressed = event => {
-        if (event.key === "Enter"){
+        if (event.key === "Enter") {
             event.preventDefault()
             send()
         }
@@ -12,16 +12,20 @@ const ChatMessageField = ({userName, setMessageText, setUserName, messageText, s
     return (
         <div className="message-input-container">
             <div className="chat-message-field">
-                    <textarea id="messageInput" className="form-control chat-text-field" value={messageText}
+                <div className="textarea-container">
+                    <textarea id="messageInput" className="chat-text-field" value={messageText}
                               onKeyPress={handleEnterPressed} rows={3} wrap={"hard"}
-                              name="messageText" onChange={(event) => setMessageText(event.target.value)}/>
-                <div id="sendButton" className="send-button" onClick={send}>Send</div>
+                              name="messageText"
+                              onChange={(event) => setMessageText(event.target.value)}/>
+                </div>
+                <div id="sendButton" className="chat-message send-button " onClick={send}>send</div>
             </div>
 
-            <div style={{textAlign: "right"}}>
-                <label className="username-input-label">Nick: </label>
+            <div style={{textAlign: "right", marginTop: 20}}>
+                <label className="username-input-label">Logged as: </label>
                 <input id="username-input" type="text" className="form-control" placeholder="Username"
-                       value={userName} name="userName" onChange={(event) => setUserName(event.target.value)}/>
+                       value={userName} name="userName"
+                       onChange={(event) => setUserName(event.target.value)}/>
             </div>
         </div>
     );
